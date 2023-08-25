@@ -504,7 +504,8 @@ void rates_bdmcmc_parallel( double rates[], double log_ratio_g_prior[], int G[],
 
 	#pragma omp parallel
 	{
-		int i, j, k, ij, jj, nu_star;
+		int i, j, k, ij, jj; 
+		double nu_star;
 		double Dsjj, sum_diag, K022, a11, sigmajj_inv, log_rate;
 
 		double *K121         = new double[ 4 ];  
@@ -569,9 +570,9 @@ void rates_bdmcmc_parallel( double rates[], double log_ratio_g_prior[], int G[],
 			sum_diag = Dsjj * ( K022 - K121[ 3 ] ) - Ds[ ij ] * ( K121[ 1 ] + K121[ 2 ] );
 
 			// nu_star = b + sum( Gf[,i] * Gf[,j] )
-			nu_star = b1;
+			nu_star = (double)b1;
 			//for( k = 0; k < dim; k++ ) nu_star += G[i * dim + k];   
-			for( k = 0; k < dim; k++ ) nu_star += G[ i * dim + k ] * G[ j * dim + k ];   
+			for( k = 0; k < dim; k++ ) nu_star += (double)(G[ i * dim + k ] * G[ j * dim + k ]);   
 			//nu_star = F77_NAME(ddot)( &dim, &G[0] + ixdim, &one, &G[0] + jxdim, &one );
 			nu_star = 0.5 * nu_star;
 
@@ -611,7 +612,8 @@ void rates_cbdmcmc_parallel( long double log_rates[], double log_ratio_g_prior[]
 
 	#pragma omp parallel
 	{
-		int i, j, k, ij, jj, rowCol, nu_star;
+		int i, j, k, ij, jj, rowCol;
+		double nu_star;
 		double r_Dsjj, r_Dsij, i_Dsij, sum_diag, r_K022, i_K022, a11, r_sigmaj11, i_sigmaj11;
 		double coef, epower, I_const, log_rate;
 
@@ -733,11 +735,11 @@ void rates_cbdmcmc_parallel( long double log_rates[], double log_ratio_g_prior[]
 			F77_NAME(dgemm)( &transN, &transT, &two, &two, &p2, &alpha, &r12xi22[0], &two, &r_K12[0], &two, &dmone, &i_K121[0], &two FCONE FCONE );											
 			// Finished (i,j) = 1 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
 			
-			nu_star = b1;
+			nu_star = (double)b1;
 			for( k = 0; k < dim; k++ ) // nu_star = b + sum( Gf[,i] * Gf[,j] )
-				nu_star += G[ i * dim + k ] * G[ j * dim + k ]; 
+				nu_star += (double)(G[ i * dim + k ] * G[ j * dim + k ]); 
 						
-			I_const  = lgammafn( 0.5 * ( nu_star + 1 ) ) - lgammafn( 0.5 * nu_star ); //I
+			I_const  = lgammafn( 0.5 * ( nu_star + 1.0 ) ) - lgammafn( 0.5 * nu_star ); //I
 
 			a11      = r_K[i * dim1] - r_K121[0]; //k_ii - k_ii^1
 			sum_diag = r_Dsjj*(r_K022 - r_K121[3]) - (r_Dsij*r_K121[1] - i_Dsij*i_K121[1]) - (r_Dsij*r_K121[2] + i_Dsij*i_K121[2]); //tr(D*(K0-K1))
