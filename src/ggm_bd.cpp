@@ -65,7 +65,7 @@ void ggm_bdmcmc_ma( int *iter, int *burnin, int G[], double g_prior[], double Ts
 		{
 		    ij = j * dim + i;
 		   
-			if( ( g_prior[ ij ] != 0.0 ) or ( g_prior[ ij ] != 1.0 ) )
+			if( ( g_prior[ ij ] != 0.0 ) and ( g_prior[ ij ] != 1.0 ) )
 			{
     			index_row[ counter ] = i;
     			index_col[ counter ] = j;
